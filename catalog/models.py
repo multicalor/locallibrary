@@ -35,6 +35,13 @@ class Book(models.Model): #Модель для книг разных жанро�
         String for representing the Model object.
         """
         return self.title
+
+    def display_genre(self):
+        """
+        Creates a string for the Genre. This is required to display genre in Admin.
+        """
+        return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
+    display_genre.short_description = 'Genre'
     
     
     def get_absolute_url(self):
@@ -49,8 +56,9 @@ class BookInstance(models.Model): #Модель для каждого отдел
     """
     Model representing a specific copy of a book (i.e. that can be borrowed from the library).
     """
+    
+    book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="Unique ID for this particular book across whole library")
-    book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True) 
     imprint = models.CharField(max_length=200)
     due_back = models.DateField(null=True, blank=True)
 
