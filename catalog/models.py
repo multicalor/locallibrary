@@ -14,6 +14,18 @@ class Genre(models.Model): #Класс жанры
         """
         return self.name
 
+class Lenguage(models.Model): #Класс жанры
+    """
+    Model representing a book genre (e.g. Science Fiction, Non Fiction).
+    """
+    name = models.CharField(max_length=200, help_text="Enter a book lenguage (e.g. Russion, English, Farci, French)")
+    
+    def __str__(self):
+        """
+        String for representing the Model object (in Admin site etc.)
+        """
+        return self.name
+
 from django.urls import reverse #Used to generate URLs by reversing the URL patterns
 
 class Book(models.Model): #Модель для книг разных жанров и авторов
@@ -29,6 +41,7 @@ class Book(models.Model): #Модель для книг разных жанро�
     genre = models.ManyToManyField(Genre, help_text="Select a genre for this book")
     # ManyToManyField used because genre can contain many books. Books can cover many genres.
     # Genre class has already been defined so we can specify the object above.
+    language = models.ForeignKey('Lenguage', on_delete=models.SET_NULL, null=True)
     
     def __str__(self):
         """
@@ -41,6 +54,7 @@ class Book(models.Model): #Модель для книг разных жанро�
         Creates a string for the Genre. This is required to display genre in Admin.
         """
         return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
+        
     display_genre.short_description = 'Genre'
     
     
@@ -79,7 +93,7 @@ class BookInstance(models.Model): #Модель для каждого отдел
         """
         String for representing the Model object
         """
-        return '%s (%s)' % (self.id,self.book.title)
+        return '{0} ({1})'.format (self.book.title, self.id)
 
 class Author(models.Model): #Модель автора с пол имени фомилией и так далее
     """
@@ -88,7 +102,7 @@ class Author(models.Model): #Модель автора с пол имени фо
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField(null=True, blank=True)
-    date_of_death = models.DateField('Died', null=True, blank=True)
+    date_of_death = models.DateField('Date of death', null=True, blank=True)
     
     def get_absolute_url(self):
         """
@@ -101,4 +115,4 @@ class Author(models.Model): #Модель автора с пол имени фо
         """
         String for representing the Model object.
         """
-        return '%s, %s' % (self.last_name, self.first_name)
+        return '{0} ({1})'.format(self.last_name, self.first_name)
